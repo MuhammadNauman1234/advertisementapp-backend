@@ -29,6 +29,81 @@ const addAdvertisement = async (req, res) => {
   }
 };
 
+
+// Read advertisement
+const readAdvertisement = async (req, res) => {
+  try {
+    
+    // Find the advertisement by ID
+    const advertisement = await Advertisement.find();
+
+    // Check if the advertisement was found
+    if (!advertisement) {
+      return res.status(404).json({ error: "Advertisement not found" });
+    }
+
+    res.status(200).json(advertisement);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// Update advertisement by ID
+const updateAdvertisement = async (req, res) => {
+  try {
+    const advertisementId = req.params.id;
+    const { title, description, price, location } = req.body;
+    console.log(title)
+    console.log(description)
+    console.log(price)
+    // Find the advertisement by ID
+    const advertisement = await Advertisement.findById(advertisementId);
+
+    // Check if the advertisement was found
+    if (!advertisement) {
+      return res.status(404).json({ error: "Advertisement not found" });
+    }
+    console.log(advertisement)
+    // Update advertisement properties
+    advertisement.title = title;
+    advertisement.description = description;
+    advertisement.pricePerDay = price;
+    advertisement.location = location;
+
+    // Save the changes
+    await advertisement.save();
+
+    res.status(200).json({ message: "Advertisement updated successfully" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
+// Delete advertisement by ID
+const deleteAdvertisement = async (req, res) => {
+  try {
+    const advertisementId = req.params.id;
+
+    // Find and delete the advertisement by ID
+    const result = await Advertisement.findByIdAndDelete(advertisementId);
+
+    // Check if the advertisement was found and deleted
+    if (!result) {
+      return res.status(404).json({ error: "Advertisement not found" });
+    }
+
+    res.status(200).json({ message: "Advertisement deleted successfully" });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+
 // book advertisement
 const bookAdvertisement = async (req, res) => {
   try {
@@ -131,4 +206,7 @@ const startBackgroundTask = (advertisementId) => {
 module.exports = {
   addAdvertisement,
   bookAdvertisement,
+  readAdvertisement,
+  updateAdvertisement,
+  deleteAdvertisement
 };
