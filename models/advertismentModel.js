@@ -25,6 +25,10 @@ const advertisementSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  addedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User', // Assuming you have a User model
+  },
   bookedBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User' // Assuming you have a User model for tracking who booked the advertisement
