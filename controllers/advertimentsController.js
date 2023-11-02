@@ -1,8 +1,5 @@
-const schedule = require("node-schedule");
 const Advertisement = require("../models/advertismentModel");
-const mongoose = require("mongoose");
 const User = require("../models/usersModel");
-const BookingHistory = require("../models/historyModel");
 
 // add advertisement
 const addAdvertisement = async (req, res) => {
