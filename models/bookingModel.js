@@ -23,6 +23,11 @@ const historyModel = new mongoose.Schema(
       totalPrice: {
         type: Number,
       },
+      status: {
+        type: String,
+        enum: ['booked', 'pending', "expired"],
+        default: 'booked',
+      }
         // Other details about the booking
       },
   {

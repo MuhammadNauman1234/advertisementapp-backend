@@ -33,7 +33,7 @@ const addAdvertisement = async (req, res) => {
 const readAdvertisement = async (req, res) => {
   try {
     // Find the advertisement by ID
-    const advertisement = await Advertisement.find();
+    const advertisement = await Advertisement.find().populate('bookingId');
 
     // Check if the advertisement was found
     if (!advertisement) {

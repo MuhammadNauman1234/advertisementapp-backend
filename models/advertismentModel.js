@@ -35,9 +35,13 @@ const advertisementSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['open for booking', 'booked', 'completed'],
+    enum: ['open for booking', 'booked', 'panding'],
     default: 'open for booking'
   },
+  bookingId: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'BookingHistory',
+  }],
   reservationStartDate: {
     type: Date,
     default: Date.now // Set default value to current date and time

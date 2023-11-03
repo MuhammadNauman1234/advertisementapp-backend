@@ -4,12 +4,13 @@ const advertisementController = require("../controllers/advertimentsController")
 const bookAdvertisementController = require("../controllers/bookadvertisementController");
 const protect = require("../middlewares/authMiddleware");
 
-Router.post("/addadvertisement", upload.array('images', 5), advertisementController.addAdvertisement);
-Router.get("/getadvertisement", advertisementController.readAdvertisement);
-Router.put("/updateadvertisement/:id", advertisementController.updateAdvertisement);
-Router.delete("/deleteadvertisement/:id", advertisementController.deleteAdvertisement);
-Router.put("/bookadvertisement/:id", bookAdvertisementController.bookAdvertisement);
-Router.put("/canceladvertisement", advertisementController.cancelAdvetisement);
-Router.get("/bookinghistory/:id", advertisementController.getBookingHistory);
+Router.post("/advertisement/create", upload.array('images', 5), advertisementController.addAdvertisement);
+Router.get("/advertisement/read", advertisementController.readAdvertisement);
+Router.put("/advertisement/update/:id", advertisementController.updateAdvertisement);
+Router.delete("/advertisement/delete/:id", advertisementController.deleteAdvertisement);
+Router.put("/advertisement/book/:id", bookAdvertisementController.bookAdvertisement);
+Router.put("/advertisement/cancel", advertisementController.cancelAdvetisement);
+Router.get("/user/bookinghistory/:id", advertisementController.getBookingHistory);
+Router.put("/advertisement/book/advance/:id", bookAdvertisementController.advanceBooking);
 
 module.exports = Router;
