@@ -8,71 +8,65 @@ const bookAdvertisement = async (req, res) => {
   try {
     const advertisementId = req.params.id;
     const { totalBookingDays, userId } = req.body;
-
     // Find the user by ID
-    const user = await User.findById(userId);
+    const user = await User.findOne({ _id: userId });
     if (!user) {
       return res.json({ message: "user not found!" });
     }
-    if (user) {
-      // Find the advertisement by ID
-      const advertisement = await Advertisement.findById(advertisementId);
+    // Find the advertisement by ID
+    const advertisement = await Advertisement.findById(advertisementId);
 
-      // Check if the advertisement was found
-      if (!advertisement) {
-        return res.status(404).json({ error: "Advertisement not found" });
-      }
-
-      // Update the advertisement properties
-      advertisement.status = "booked";
-      advertisement.bookedBy = userId;
-      advertisement.totalBookingDays = totalBookingDays;
-
-      // Define reservationStartDate here
-      const reservationStartDate = new Date();
-      advertisement.reservationStartDate = reservationStartDate;
-
-      // Check if totalBookingDays is a positive integer
-      if (!Number.isInteger(totalBookingDays) || totalBookingDays <= 0) {
-        return res
-          .status(400)
-          .json({ error: "Invalid totalBookingDays value" });
-      }
-
-      // Define and calculate reservationEndDate
-      advertisement.reservationEndDate = new Date(
-        reservationStartDate.getTime() + totalBookingDays * 24 * 60 * 60 * 1000
-      );
-      // Save the changes
-      await advertisement.save();
-
-      //calculate total price
-      const totalPrice = totalBookingDays * advertisement.pricePerDay;
-
-      // Create a new booking history entry
-      const newBooking = new BookingHistory({
-        userId,
-        advertisementId,
-        totalBookingDays,
-        totalPrice,
-        bookingDate: new Date(),
-        // Other details about the booking
-      });
-
-      // Save the new booking history entry
-      await newBooking.save();
-
-      user.bookHistory.push(newBooking._id);
-      user.save();
-      // Start the background task to automatically cancel reservation
-      const backgroundTaskJob = startBackgroundTask(advertisementId);
-
-      // Respond with success message
-      res.status(200).json({
-        message: "Advertisement Booked Successfully!",
-        totalPrice: totalPrice,
-      });
+    // Check if the advertisement was found
+    if (!advertisement) {
+      return res.status(404).json({ error: "Advertisement not found" });
     }
+
+    //calculate total price
+    const totalPrice = totalBookingDays * advertisement.pricePerDay;
+
+    // Create a new booking history entry
+    const newBooking = new BookingHistory({
+      userId,
+      advertisementId,
+      totalBookingDays,
+      totalPrice,
+      bookingDate: new Date(),
+      // Other details about the booking
+    });
+
+    // Save the new booking history entry
+    await newBooking.save();
+
+    user.bookHistory.push(newBooking._id);
+    user.save();
+
+    // Update the advertisement properties
+    advertisement.status = "booked";
+    advertisement.bookedBy = userId;
+    advertisement.totalBookingDays = totalBookingDays;
+    // Define reservationStartDate here
+    const reservationStartDate = new Date();
+    advertisement.reservationStartDate = reservationStartDate;
+    // Check if totalBookingDays is a positive integer
+    if (!Number.isInteger(totalBookingDays) || totalBookingDays <= 0) {
+      return res.status(400).json({ error: "Invalid totalBookingDays value" });
+    }
+    // Define and calculate reservationEndDate
+    advertisement.reservationEndDate = new Date(
+      reservationStartDate.getTime() + totalBookingDays * 24 * 60 * 60 * 1000
+    );
+    // pushing id into advertisement collection
+    advertisement.bookingId.push(newBooking._id);
+    // Save the changes
+    await advertisement.save();
+    // Start the background task to automatically cancel reservation
+    const backgroundTaskJob = startBackgroundTask(advertisementId);
+
+    // Respond with success message
+    res.status(200).json({
+      message: "Advertisement Booked Successfully!",
+      totalPrice: totalPrice,
+    });
   } catch (error) {
     // Handle errors and respond with an error message
     console.error(error.message);
@@ -100,8 +94,8 @@ const advanceBooking = async (req, res) => {
     // Create a new booking history entry with status set to 'pending'
     const price = advertisement.pricePerDay;
     const totalPrice = price * totalBookingDays;
-
-    const newBooking = new BookingHistory({
+    // Create a new booking history entry with status set to 'pending'
+    const newBooking = await BookingHistory.create({
       userId,
       advertisementId,
       totalBookingDays,
@@ -110,13 +104,13 @@ const advanceBooking = async (req, res) => {
       status: "pending", // Set the initial status to 'pending'
       // Other details about the booking
     });
-
-    // Save the new booking history entry
-    await newBooking.save();
-
     // pushing booking id into user booking history
     user.bookHistory.push(newBooking._id);
     await user.save();
+
+    // pushing id into advertisement collection
+    advertisement.bookingId.push(newBooking._id);
+    await advertisement.save();
 
     res.status(200).json({ message: "advance booking done successfully" });
     // ...
