@@ -3,6 +3,7 @@ const dotenv = require("dotenv");
 const { default: mongoose } = require("mongoose");
 const usersRoutes = require("./routes/usersRoutes")
 const advertisementRoutes = require("./routes/advertismentsRoutes");
+const wishlistRoutes = require("./routes/wishlistRoutes");
 const path = require("path")
 
 
@@ -15,6 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.json());
 app.use("/api", usersRoutes)
 app.use("/api", advertisementRoutes);
+app.use("/api", wishlistRoutes);
 
 const PORT = process.env.PORT || 5001;
 
